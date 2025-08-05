@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Todo List</h1>
+    </header>
+
+    <div class="box">
+        <form action="/filter" method="post" class="filter-form">
+            <label for="filter-priority">Filter by Priority:</label>
+            <select name="filterPriority" id="filter-priority" onchange="this.form.submit()">
+                <option value="All" <%= filter === 'All' ? 'selected' : '' %>>All</option>
+                <option value="High" <%= filter === 'High' ? 'selected' : '' %>>High</option>
+                <option value="Medium" <%= filter === 'Medium' ? 'selected' : '' %>>Medium</option>
+                <option value="Low" <%= filter === 'Low' ? 'selected' : '' %>>Low</option>
+            </select>
+        </form>
+
+        <% if (exej.length === 0) { %>
+            <p class="empty-list">Your list is empty. Add a new task!</p>
+        <% } %>
+
+        <% for(var i = 0; i < exej.length; i++) {%>
+            <div class="item">
+                <form action="/delete" method="post">
+                    <input type="checkbox" onchange="this.form.submit()">
+                    <input type="hidden" name="deleteId" value="<%= exej[i].id %>">
+                </form>
+                <p class="task-text <%= exej[i].priority.toLowerCase() %>"> <%= exej[i].task %> </p>
+                <span class="priority-tag <%= exej[i].priority.toLowerCase() %>"><%= exej[i].priority %></span>
+                
+                <form action="/edit" method="post" class="edit-form">
+                    <input type="hidden" name="editId" value="<%= exej[i].id %>">
+                    <input type="text" name="updatedTask" value="<%= exej[i].task %>" required>
+                    <select name="updatedPriority">
+                        <option value="High" <%= exej[i].priority === 'High' ? 'selected' : '' %>>High</option>
+                        <option value="Medium" <%= exej[i].priority === 'Medium' ? 'selected' : '' %>>Medium</option>
+                        <option value="Low" <%= exej[i].priority === 'Low' ? 'selected' : '' %>>Low</option>
+                    </select>
+                    <button type="submit" class="edit-btn">Save</button>
+                </form>
+                <button onclick="toggleEditForm(this)" class="toggle-edit-btn">Edit</button>
+            </div>
+        <% } %>
+
+        <form action="/" method="post" onsubmit="return validateForm()">
+            <input type="text" name="ele1" id="newItemInput" placeholder="Add new task">
+            <select name="priority">
+                <option value="High">High</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Low">Low</option>
+            </select>
+            <button type="submit">+</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Shriharsh. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function validateForm() {
+            const input = document.getElementById('newItemInput');
+            if (input.value.trim() === "") {
+                alert("Please add a task before clicking the add button.");
+                return false;
+            }
+            return true;
+        }
+
+        function toggleEditForm(btn) {
+            const itemDiv = btn.closest('.item');
+            const editForm = itemDiv.querySelector('.edit-form');
+            const taskText = itemDiv.querySelector('.task-text');
+            const priorityTag = itemDiv.querySelector('.priority-tag');
+
+            taskText.style.display = taskText.style.display === 'none' ? 'block' : 'none';
+            priorityTag.style.display = priorityTag.style.display === 'none' ? 'block' : 'none';
+            editForm.style.display = editForm.style.display === 'block' ? 'none' : 'block';
+            btn.textContent = btn.textContent === 'Edit' ? 'Cancel' : 'Edit';
+        }
+    </script>
+</body>
+</html>
